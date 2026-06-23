@@ -170,13 +170,16 @@
       color: var(--brand-muted);
       font-size: .95rem;
     }
-    .input-prefix-wrap input { padding-left: 28px; }
+    .input-prefix-wrap input { padding-left: 32px; }
 
     /* ── Calculate button ── */
-    .btn-calc {
+    .btn-row {
       margin-top: 22px;
-      display: block;
-      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-calc {
+      flex: 1;
       padding: 13px;
       background: var(--brand-accent);
       color: #fff;
@@ -189,6 +192,18 @@
       transition: opacity .15s;
     }
     .btn-calc:hover { opacity: .88; }
+    .btn-clear {
+      padding: 13px 20px;
+      background: none;
+      color: var(--brand-muted);
+      border: 1.5px solid var(--brand-border);
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-clear:hover { border-color: var(--brand-danger); color: var(--brand-danger); }
 
     /* ── Results ── */
     .results { display: none; }
@@ -347,7 +362,10 @@
           </div>
         </div>
       </div>
-      <button class="btn-calc" onclick="calcGSA()">Calculate Expected Leads</button>
+      <div class="btn-row">
+        <button class="btn-calc" onclick="calcGSA()">Calculate Expected Leads</button>
+        <button class="btn-clear" onclick="clearGSA()">Clear</button>
+      </div>
     </div>
 
     <div class="results" id="gsa-results">
@@ -384,7 +402,10 @@
           </div>
         </div>
       </div>
-      <button class="btn-calc" onclick="calcLSA()">Calculate Expected Leads</button>
+      <div class="btn-row">
+        <button class="btn-calc" onclick="calcLSA()">Calculate Expected Leads</button>
+        <button class="btn-clear" onclick="clearLSA()">Clear</button>
+      </div>
     </div>
 
     <div class="results" id="lsa-results">
@@ -446,10 +467,10 @@
   function reliabilityHTML(level, leadLow, leadHigh, budget) {
     const msgs = {
       strong: `<span class="badge">Strong Benchmark</span>
-               You could likely expect <strong>${leadLow}–${leadHigh} leads/month</strong>
+               You could likely expect <strong>${leadLow}–${leadHigh} qualified leads/month</strong>
                at a <strong>$${Number(budget).toLocaleString()}</strong> spend, based on historical data.`,
       weak:   `<span class="badge">Weak Benchmark</span>
-               Limited data — treat the <strong>${leadLow}–${leadHigh} lead</strong> range as a rough estimate only.
+               Limited data — treat the <strong>${leadLow}–${leadHigh} qualified lead</strong> range as a rough estimate only.
                More clients in this category are needed for a reliable benchmark.`,
       none:   `<span class="badge">No Benchmark</span>
                There is not enough data for this shop type / service area combination to produce a reliable estimate.`,
@@ -470,16 +491,19 @@
         <div class="result-cell high">
           <div class="cell-label">High Estimate</div>
           <div class="cell-leads">${high}</div>
+          <div class="cell-cpl">qualified leads</div>
           <div class="cell-cpl">@ $${data.p25.toFixed(2)} CPL</div>
         </div>
         <div class="result-cell avg">
           <div class="cell-label">Median Estimate</div>
           <div class="cell-leads">${avg}</div>
+          <div class="cell-cpl">qualified leads</div>
           <div class="cell-cpl">@ $${data.med.toFixed(2)} CPL</div>
         </div>
         <div class="result-cell low">
           <div class="cell-label">Low Estimate</div>
           <div class="cell-leads">${low}</div>
+          <div class="cell-cpl">qualified leads</div>
           <div class="cell-cpl">@ $${data.p75.toFixed(2)} CPL</div>
         </div>
       </div>
@@ -531,6 +555,20 @@
     const el = document.getElementById("lsa-results");
     el.classList.add("visible");
     el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── Clear functions ──────────────────────────────────────────────
+  function clearGSA() {
+    document.getElementById("gsa-shop").value = "";
+    document.getElementById("gsa-area").value = "";
+    document.getElementById("gsa-budget").value = "";
+    document.getElementById("gsa-results").classList.remove("visible");
+  }
+
+  function clearLSA() {
+    document.getElementById("lsa-area").value = "";
+    document.getElementById("lsa-budget").value = "";
+    document.getElementById("lsa-results").classList.remove("visible");
   }
 
   // ── Tab switching ────────────────────────────────────────────────
