@@ -7,14 +7,14 @@
   <style>
     /* ── Brand tokens ── */
     :root {
-      --brand-primary:   #1A3C5E; /* replace with your primary hex */
-      --brand-accent:    #F4A623; /* replace with your accent hex  */
-      --brand-bg:        #F7F9FC;
+      --brand-primary:   #113595;
+      --brand-accent:    #80bc03;
+      --brand-bg:        #F5F7FA;
       --brand-surface:   #FFFFFF;
       --brand-border:    #DDE3EC;
       --brand-text:      #1C2B3A;
       --brand-muted:     #6B7A8D;
-      --brand-success:   #2ECC71;
+      --brand-success:   #80bc03;
       --brand-warn:      #E67E22;
       --brand-danger:    #E74C3C;
       --radius:          10px;
@@ -32,32 +32,25 @@
 
     /* ── Header ── */
     header {
-      background: var(--brand-primary);
-      color: #fff;
-      padding: 18px 32px;
+      background: #ffffff;
+      border-bottom: 3px solid var(--brand-accent);
+      padding: 14px 32px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,.10);
     }
     header img#logo {
-      height: 48px;
+      height: 64px;
       width: auto;
       object-fit: contain;
     }
-    .header-placeholder {
-      /* shown when no logo uploaded yet */
-      height: 48px;
-      display: flex;
-      align-items: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -.5px;
-    }
-    header .tagline {
+    .header-tool-name {
       font-size: .8rem;
-      opacity: .75;
-      margin-top: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--brand-muted);
     }
 
     /* ── Layout ── */
@@ -72,6 +65,8 @@
       font-weight: 700;
       margin-bottom: 4px;
       color: var(--brand-primary);
+      border-left: 4px solid var(--brand-accent);
+      padding-left: 12px;
     }
     p.page-sub {
       color: var(--brand-muted);
@@ -293,12 +288,15 @@
 <body>
 
 <header>
-  <!-- Replace src with your actual logo path once uploaded -->
-  <!-- <img id="logo" src="logo.png" alt="Shop Marketing Pros" /> -->
-  <div class="header-placeholder">
-    Shop Marketing Pros
-    <div class="tagline">Budget Prediction Tool</div>
+  <!-- Logo: replace src with logo.png once the file is added to the repo -->
+  <img id="logo" src="logo.png" alt="Shop Marketing Pros"
+       onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';" />
+  <div id="logo-fallback" style="display:none; align-items:center; gap:6px; font-size:1.3rem; font-weight:800; color:var(--brand-primary);">
+    <span style="color:var(--brand-primary);">SHOP</span>
+    <span style="color:var(--brand-accent);">Marketing</span>
+    <span style="color:var(--brand-primary);">PROS</span>
   </div>
+  <div class="header-tool-name">Budget Prediction Tool</div>
 </header>
 
 <main>
