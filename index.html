@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Predictor | Shop Marketing Pros</title>
+  <style>
+    /* ── Brand tokens ── */
+    :root {
+      --brand-primary:   #1A3C5E; /* replace with your primary hex */
+      --brand-accent:    #F4A623; /* replace with your accent hex  */
+      --brand-bg:        #F7F9FC;
+      --brand-surface:   #FFFFFF;
+      --brand-border:    #DDE3EC;
+      --brand-text:      #1C2B3A;
+      --brand-muted:     #6B7A8D;
+      --brand-success:   #2ECC71;
+      --brand-warn:      #E67E22;
+      --brand-danger:    #E74C3C;
+      --radius:          10px;
+      --shadow:          0 2px 12px rgba(0,0,0,.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--brand-bg);
+      color: var(--brand-text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--brand-primary);
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    header img#logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+    .header-placeholder {
+      /* shown when no logo uploaded yet */
+      height: 48px;
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -.5px;
+    }
+    header .tagline {
+      font-size: .8rem;
+      opacity: .75;
+      margin-top: 2px;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 780px;
+      margin: 40px auto;
+      padding: 0 20px 60px;
+    }
+
+    h1.page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--brand-primary);
+    }
+    p.page-sub {
+      color: var(--brand-muted);
+      font-size: .92rem;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--brand-border);
+    }
+    .tab-btn {
+      padding: 10px 28px;
+      border: none;
+      background: none;
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--brand-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color .15s, border-color .15s;
+    }
+    .tab-btn.active {
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-accent);
+    }
+    .tab-btn:hover:not(.active) { color: var(--brand-text); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--brand-surface);
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--brand-primary);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .form-grid.single { grid-template-columns: 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--brand-muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .field select,
+    .field input[type="number"] {
+      padding: 10px 14px;
+      border: 1.5px solid var(--brand-border);
+      border-radius: 7px;
+      font-size: .95rem;
+      color: var(--brand-text);
+      background: var(--brand-bg);
+      transition: border-color .15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7A8D' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .field select:focus,
+    .field input[type="number"]:focus {
+      outline: none;
+      border-color: var(--brand-accent);
+    }
+
+    .input-prefix-wrap {
+      position: relative;
+    }
+    .input-prefix-wrap span {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--brand-muted);
+      font-size: .95rem;
+    }
+    .input-prefix-wrap input { padding-left: 28px; }
+
+    /* ── Calculate button ── */
+    .btn-calc {
+      margin-top: 22px;
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: var(--brand-accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: opacity .15s;
+    }
+    .btn-calc:hover { opacity: .88; }
+
+    /* ── Results ── */
+    .results { display: none; }
+    .results.visible { display: block; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .result-cell {
+      background: var(--brand-bg);
+      border: 1.5px solid var(--brand-border);
+      border-radius: 8px;
+      padding: 16px 14px;
+      text-align: center;
+    }
+    .result-cell .cell-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--brand-muted);
+      margin-bottom: 8px;
+    }
+    .result-cell .cell-leads {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+      line-height: 1;
+    }
+    .result-cell .cell-cpl {
+      font-size: .8rem;
+      color: var(--brand-muted);
+      margin-top: 5px;
+    }
+    .result-cell.high  { border-color: var(--brand-success); }
+    .result-cell.avg   { border-color: var(--brand-accent);  }
+    .result-cell.low   { border-color: var(--brand-danger);  }
+
+    /* ── Reliability badge ── */
+    .reliability {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .reliability.strong { background: #EAF8F0; border: 1px solid #A8DFBB; }
+    .reliability.weak   { background: #FEF6E4; border: 1px solid #F5C77E; }
+    .reliability.none   { background: #FDECEA; border: 1px solid #F3AEAA; }
+    .reliability .badge {
+      font-weight: 800;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      white-space: nowrap;
+      padding: 3px 9px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .reliability.strong .badge { background: var(--brand-success); color: #fff; }
+    .reliability.weak   .badge { background: var(--brand-warn);    color: #fff; }
+    .reliability.none   .badge { background: var(--brand-danger);  color: #fff; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      font-size: .78rem;
+      color: var(--brand-muted);
+      border-top: 1px solid var(--brand-border);
+      padding-top: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── No benchmark ── */
+    .no-benchmark {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--brand-danger);
+      font-weight: 600;
+      font-size: .95rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: 1fr; }
+      .card { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <!-- Replace src with your actual logo path once uploaded -->
+  <!-- <img id="logo" src="logo.png" alt="Shop Marketing Pros" /> -->
+  <div class="header-placeholder">
+    Shop Marketing Pros
+    <div class="tagline">Budget Prediction Tool</div>
+  </div>
+</header>
+
+<main>
+  <h1 class="page-title">Test Your Ad Budget</h1>
+  <p class="page-sub">
+    Enter a budget below to see expected lead ranges based on historical client data.
+    Use these as directional benchmarks — not guarantees.
+  </p>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="gsa">Google Search Ads (GSA)</button>
+    <button class="tab-btn" data-tab="lsa">Local Service Ads (LSA)</button>
+  </div>
+
+  <!-- GSA TAB -->
+  <div class="tab-panel active" id="tab-gsa">
+    <div class="card">
+      <h2>GSA — Input Your Parameters</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Shop Type</label>
+          <select id="gsa-shop">
+            <option value="">— Select —</option>
+            <option value="Diesel">Diesel</option>
+            <option value="European">European</option>
+            <option value="General">General</option>
+            <option value="Off-Road">Off-Road</option>
+            <option value="Specialty">Specialty</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Service Area</label>
+          <select id="gsa-area">
+            <option value="">— Select —</option>
+            <option value="Metro">Metro</option>
+            <option value="Sub-urban">Sub-urban</option>
+            <option value="Rural">Rural</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid single" style="margin-top:18px;">
+        <div class="field">
+          <label>Monthly Budget</label>
+          <div class="input-prefix-wrap">
+            <span>$</span>
+            <input type="number" id="gsa-budget" placeholder="e.g. 5000" min="0" step="50" />
+          </div>
+        </div>
+      </div>
+      <button class="btn-calc" onclick="calcGSA()">Calculate Expected Leads</button>
+    </div>
+
+    <div class="results" id="gsa-results">
+      <div class="card">
+        <h2 id="gsa-results-title">Expected Lead Range</h2>
+        <div id="gsa-output"></div>
+        <p class="disclaimer">
+          These expectations are based on historical 12-month performance applied at monthly budget levels
+          and are intended as directional benchmarks, not guarantees.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LSA TAB -->
+  <div class="tab-panel" id="tab-lsa">
+    <div class="card">
+      <h2>LSA — Input Your Parameters</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Service Area</label>
+          <select id="lsa-area">
+            <option value="">— Select —</option>
+            <option value="Metro">Metro</option>
+            <option value="Sub-urban">Sub-urban</option>
+            <option value="Rural">Rural</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Monthly Budget</label>
+          <div class="input-prefix-wrap">
+            <span>$</span>
+            <input type="number" id="lsa-budget" placeholder="e.g. 3000" min="0" step="50" />
+          </div>
+        </div>
+      </div>
+      <button class="btn-calc" onclick="calcLSA()">Calculate Expected Leads</button>
+    </div>
+
+    <div class="results" id="lsa-results">
+      <div class="card">
+        <h2 id="lsa-results-title">Expected Lead Range</h2>
+        <div id="lsa-output"></div>
+        <p class="disclaimer">
+          These expectations are based on historical 6-month performance applied at monthly budget levels
+          and are intended as directional benchmarks, not guarantees.
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ── Reference Data ──────────────────────────────────────────────
+  const GSA_DATA = {
+    "Diesel": {
+      "Metro":     { n: 1,  p25: 254.73, med: 254.73, p75: 254.73 },
+      "Rural":     { n: 4,  p25: 50.15,  med: 57.80,  p75: 67.23  },
+      "Sub-urban": { n: 1,  p25: 220.76, med: 220.76, p75: 220.76 },
+    },
+    "European": {
+      "Metro":     { n: 5,  p25: 312.49, med: 371.97, p75: 489.80 },
+      "Rural":     { n: 3,  p25: 398.46, med: 475.81, p75: 508.72 },
+      "Sub-urban": { n: 4,  p25: 139.19, med: 240.64, p75: 380.23 },
+    },
+    "General": {
+      "Metro":     { n: 17, p25: 84.85,  med: 132.58, p75: 207.51 },
+      "Rural":     { n: 16, p25: 82.23,  med: 101.64, p75: 171.18 },
+      "Sub-urban": { n: 5,  p25: 131.78, med: 141.40, p75: 210.03 },
+    },
+    "Off-Road": {
+      "Metro":     { n: 0,  p25: null, med: null, p75: null },
+      "Rural":     { n: 1,  p25: 132.12, med: 132.12, p75: 132.12 },
+      "Sub-urban": { n: 0,  p25: null, med: null, p75: null },
+    },
+    "Specialty": {
+      "Metro":     { n: 2,  p25: 173.17, med: 268.08, p75: 362.99 },
+      "Rural":     { n: 4,  p25: 549.23, med: 721.97, p75: 810.17 },
+      "Sub-urban": { n: 0,  p25: null, med: null, p75: null },
+    },
+  };
+
+  const LSA_DATA = {
+    "Metro":     { p25: 17.40, med: 19.69, p75: 23.96 },
+    "Sub-urban": { p25: 16.33, med: 20.57, p75: 23.03 },
+    "Rural":     { p25: 14.73, med: 17.82, p75: 21.14 },
+  };
+
+  // ── Reliability helper ───────────────────────────────────────────
+  function reliability(n) {
+    if (!n || n === 0) return "none";
+    if (n <= 2) return "weak";
+    return "strong";
+  }
+
+  function reliabilityHTML(level, leadLow, leadHigh, budget) {
+    const msgs = {
+      strong: `<span class="badge">Strong Benchmark</span>
+               You could likely expect <strong>${leadLow}–${leadHigh} leads/month</strong>
+               at a <strong>$${Number(budget).toLocaleString()}</strong> spend, based on historical data.`,
+      weak:   `<span class="badge">Weak Benchmark</span>
+               Limited data — treat the <strong>${leadLow}–${leadHigh} lead</strong> range as a rough estimate only.
+               More clients in this category are needed for a reliable benchmark.`,
+      none:   `<span class="badge">No Benchmark</span>
+               There is not enough data for this shop type / service area combination to produce a reliable estimate.`,
+    };
+    return `<div class="reliability ${level}">${msgs[level]}</div>`;
+  }
+
+  function resultsHTML(data, budget, rel) {
+    if (rel === "none") {
+      return `<div class="no-benchmark">No available benchmark for this combination.</div>`;
+    }
+    const high = Math.floor(budget / data.p25);
+    const avg  = Math.floor(budget / data.med);
+    const low  = Math.floor(budget / data.p75);
+    return `
+      ${reliabilityHTML(rel, low, high, budget)}
+      <div class="results-grid">
+        <div class="result-cell high">
+          <div class="cell-label">High Estimate</div>
+          <div class="cell-leads">${high}</div>
+          <div class="cell-cpl">@ $${data.p25.toFixed(2)} CPL</div>
+        </div>
+        <div class="result-cell avg">
+          <div class="cell-label">Median Estimate</div>
+          <div class="cell-leads">${avg}</div>
+          <div class="cell-cpl">@ $${data.med.toFixed(2)} CPL</div>
+        </div>
+        <div class="result-cell low">
+          <div class="cell-label">Low Estimate</div>
+          <div class="cell-leads">${low}</div>
+          <div class="cell-cpl">@ $${data.p75.toFixed(2)} CPL</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── GSA Calculation ──────────────────────────────────────────────
+  function calcGSA() {
+    const shop   = document.getElementById("gsa-shop").value;
+    const area   = document.getElementById("gsa-area").value;
+    const budget = parseFloat(document.getElementById("gsa-budget").value);
+
+    if (!shop || !area || !budget || budget <= 0) {
+      alert("Please fill in all three fields before calculating.");
+      return;
+    }
+
+    const row = GSA_DATA[shop][area];
+    const rel = reliability(row.n);
+    const title = `${shop} · ${area} · $${budget.toLocaleString()}/mo`;
+
+    document.getElementById("gsa-results-title").textContent = title;
+    document.getElementById("gsa-output").innerHTML = resultsHTML(row, budget, rel);
+    const el = document.getElementById("gsa-results");
+    el.classList.add("visible");
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── LSA Calculation ──────────────────────────────────────────────
+  function calcLSA() {
+    const area   = document.getElementById("lsa-area").value;
+    const budget = parseFloat(document.getElementById("lsa-budget").value);
+
+    if (!area || !budget || budget <= 0) {
+      alert("Please fill in both fields before calculating.");
+      return;
+    }
+
+    const row = LSA_DATA[area];
+    // LSA data is well-sourced; treat all as strong
+    const rel = "strong";
+    const high = Math.floor(budget / row.p25);
+    const avg  = Math.floor(budget / row.med);
+    const low  = Math.floor(budget / row.p75);
+    const title = `LSA · ${area} · $${budget.toLocaleString()}/mo`;
+
+    document.getElementById("lsa-results-title").textContent = title;
+    document.getElementById("lsa-output").innerHTML = resultsHTML(row, budget, rel);
+    const el = document.getElementById("lsa-results");
+    el.classList.add("visible");
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── Tab switching ────────────────────────────────────────────────
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+</script>
+</body>
+</html>
